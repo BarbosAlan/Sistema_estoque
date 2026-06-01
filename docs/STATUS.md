@@ -87,8 +87,8 @@
 
 | Item                              | Status | Notas |
 |-----------------------------------|--------|-------|
-| Autenticação                      | ⬜     |       |
-| Tela inicial (resumo)             | ⬜     |       |
-| Consulta de produtos              | ⬜     |       |
-| Registrar saída                   | ⬜     |       |
-| Alertas push                      | ⬜     |       |
+| Autenticação                      | ✅     | Login com e-mail ou username |
+| Tela inicial (resumo)             | ✅     | Cards de stats + últimas movimentações |
+| Consulta de produtos              | ✅     | Lista com busca em tempo real e indicador de estoque |
+| Registrar saída                   | ✅     | Busca produto, valida estoque, chama registrar_movimento RPC |
+| Alertas push                      | ⬜     | Requer configuração Expo push tokens |

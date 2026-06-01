@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Sistema de Estoque",
+    "slug": "sistema-estoque",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "sistema-estoque",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#DC2626"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.estoque.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#DC2626"
+      },
+      "package": "com.estoque.app"
+    },
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}
