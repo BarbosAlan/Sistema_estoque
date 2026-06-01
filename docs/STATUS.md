@@ -14,12 +14,16 @@
 
 ## Infraestrutura
 
+> Trigger de criação automática de profile adicionado em 20260601000000_add_create_profile_trigger.sql
+
+
+
 | Item                              | Status | Notas |
 |-----------------------------------|--------|-------|
 | Estrutura de pastas               | ✅     |       |
 | Configuração do monorepo (pnpm)   | ✅     | pnpm workspaces + Turborepo |
-| Configuração Supabase local       | ⬜     |       |
-| Deploy Vercel configurado         | ⬜     |       |
+| Configuração Supabase local       | ✅     | supabase link + db push |
+| Deploy Vercel configurado         | ✅     | vercel.com/barbosalans-projects/sistema-estoque-web |
 | Variáveis de ambiente             | ✅     | .env.example criado, env.ts tipado |
 
 ## Backend / Banco de dados
@@ -33,7 +37,7 @@
 | Migration: alerts                 | ✅     | 20240101000000_initial_schema.sql |
 | RLS policies                      | ✅     | 20240101000000_initial_schema.sql |
 | Seed com dados iniciais           | ✅     | 8 categorias inseridas via REST API |
-| Edge Function: check-low-stock    | ⬜     |       |
+| Edge Function: check-low-stock    | ✅     | Vercel Cron Job — /api/cron/check-low-stock, roda diariamente às 8h UTC |
 
 ## Web — Autenticação
 
