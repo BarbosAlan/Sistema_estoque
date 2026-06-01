@@ -1,0 +1,8 @@
+packages:
+  - 'web'
+  - 'mobile'
+  - 'packages/*'
+allowBuilds:
+  core-js: set this to true or false
+  msw: false
+  unrs-resolver: true
