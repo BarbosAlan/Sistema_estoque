@@ -65,14 +65,13 @@ export async function GET(request: Request) {
         .eq('resolvido', false)
     } else {
       // Estoque OK — resolve todos os alertas abertos do produto
-      const { count } = await supabase
+      await supabase
         .from('alerts')
         .update({ resolvido: true })
         .eq('produto_id', product.id)
         .eq('resolvido', false)
-        .select('*', { count: 'exact', head: true })
 
-      resolvidos += count ?? 0
+      resolvidos++
     }
   }
 
