@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -22,7 +21,6 @@ const loginSchema = z.object({
 type LoginInput = z.infer<typeof loginSchema>
 
 export function LoginForm() {
-  const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
 
   const form = useForm<LoginInput>({
@@ -34,8 +32,7 @@ export function LoginForm() {
     setServerError(null)
     try {
       await authService.signIn(data.identifier, data.password)
-      router.push('/')
-      router.refresh()
+      window.location.href = '/'
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''
       setServerError(
