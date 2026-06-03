@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowDownCircle, ArrowUpCircle, Search } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, Search, PackageMinus } from 'lucide-react'
 import { useMovements } from '@/hooks/useMovements'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { MovimentacaoFormModal } from '@/components/forms/MovimentacaoForm'
+import { SaidaEmLoteModal } from '@/components/forms/SaidaEmLoteForm'
 import { Pagination } from '@/components/ui/pagination'
 import type { MovementType } from '@estoque/shared'
 
@@ -45,6 +46,7 @@ export function MovimentacoesTable() {
   const [page, setPage] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
   const [defaultTipo, setDefaultTipo] = useState<'entrada' | 'saida'>('entrada')
+  const [loteOpen, setLoteOpen] = useState(false)
 
   const { data: movements = [], total, isLoading } = useMovements(
     { tipo, from_date: fromDate, to_date: toDate, search },
@@ -63,6 +65,10 @@ export function MovimentacoesTable() {
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Movimentações</h1>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setLoteOpen(true)}>
+            <PackageMinus className="h-4 w-4 text-destructive sm:mr-2" />
+            <span className="hidden sm:inline">Saída em lote</span>
+          </Button>
           <Button variant="outline" size="sm" onClick={() => openModal('saida')}>
             <ArrowUpCircle className="h-4 w-4 text-destructive sm:mr-2" />
             <span className="hidden sm:inline">Saída</span>
@@ -177,6 +183,8 @@ export function MovimentacoesTable() {
       </div>
 
       <Pagination page={page} total={total} limit={20} onChange={setPage} />
+
+      <SaidaEmLoteModal open={loteOpen} onClose={() => setLoteOpen(false)} />
 
       <MovimentacaoFormModal
         open={modalOpen}

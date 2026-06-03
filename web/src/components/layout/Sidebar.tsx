@@ -10,6 +10,7 @@ import {
   Bell,
   BarChart2,
   Users,
+  TrendingDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/produtos',       label: 'Produtos',        icon: Package,         perfis: ['admin', 'estoquista', 'funcionario'] },
   { href: '/movimentacoes',  label: 'Movimentações',   icon: ArrowLeftRight,  perfis: ['admin', 'estoquista', 'funcionario'] },
   { href: '/alertas',        label: 'Alertas',         icon: Bell,            perfis: ['admin', 'estoquista'] },
+  { href: '/ruptura',        label: 'Previsão',         icon: TrendingDown,    perfis: ['admin', 'estoquista'] },
   { href: '/relatorios',     label: 'Relatórios',      icon: BarChart2,       perfis: ['admin', 'estoquista'] },
   { href: '/usuarios',       label: 'Usuários',        icon: Users,           perfis: ['admin'] },
 ] as const

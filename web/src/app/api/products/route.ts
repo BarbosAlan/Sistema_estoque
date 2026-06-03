@@ -12,7 +12,7 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   const supabase = await createClient()
 
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
-  const limit = 20
+  const limit = Math.min(Math.max(1, Number(searchParams.get('limit') ?? '20')), 5000)
   const from = (page - 1) * limit
   const to = from + limit - 1
 

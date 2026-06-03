@@ -10,12 +10,13 @@ export type ProductFilters = {
 }
 
 export const productsService = {
-  async list(filters: ProductFilters = {}, page = 1): Promise<{ data: ProductWithCategory[]; total: number }> {
+  async list(filters: ProductFilters = {}, page = 1, limit = 20): Promise<{ data: ProductWithCategory[]; total: number }> {
     const params = new URLSearchParams()
     if (filters.search) params.set('search', filters.search)
     if (filters.categoria_id) params.set('categoria_id', filters.categoria_id)
     if (filters.status) params.set('status', filters.status)
     params.set('page', String(page))
+    params.set('limit', String(limit))
 
     const res = await fetch(`/api/products?${params}`)
     const json = await res.json()

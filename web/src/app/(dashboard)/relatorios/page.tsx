@@ -92,7 +92,7 @@ export default function RelatoriosPage() {
   const [categoriaId, setCategoriaId] = useState('')
   const [status, setStatus] = useState<'ativo' | 'inativo' | 'todos'>('ativo')
 
-  const { data: products = [], isLoading } = useProducts({ search, categoria_id: categoriaId, status })
+  const { data: products = [], isLoading } = useProducts({ search, categoria_id: categoriaId, status }, 1, true)
   const { data: categories = [] } = useCategories()
 
   const stats = useMemo(() => ({
