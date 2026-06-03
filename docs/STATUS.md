@@ -91,4 +91,4 @@
 | Tela inicial (resumo)             | ✅     | Cards de stats + últimas movimentações |
 | Consulta de produtos              | ✅     | Lista com busca em tempo real e indicador de estoque |
 | Registrar saída                   | ✅     | Busca produto, valida estoque, chama registrar_movimento RPC |
-| Alertas push                      | ⬜     | Requer configuração Expo push tokens |
+| Alertas push                      | ✅     | Expo push tokens salvos no Supabase; cron dispara notificação para admin/estoquista ao criar novo alerta |

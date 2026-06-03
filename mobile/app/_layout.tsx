@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { supabase } from '@/lib/supabase'
+import { registerPushToken } from '@/services/notificationsService'
 import type { Session } from '@supabase/supabase-js'
 
 export default function RootLayout() {
@@ -16,8 +17,11 @@ export default function RootLayout() {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
+      if (event === 'SIGNED_IN') {
+        registerPushToken().catch(console.error)
+      }
     })
 
     return () => subscription.unsubscribe()
