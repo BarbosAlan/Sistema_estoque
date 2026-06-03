@@ -4,5 +4,6 @@ packages:
   - 'packages/*'
 allowBuilds:
   core-js: false
+  esbuild: true
   msw: false
   unrs-resolver: true

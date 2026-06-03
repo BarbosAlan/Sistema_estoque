@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { determinarTipoAlerta } from '@/utils/alertas'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -67,12 +68,7 @@ export async function GET(request: Request) {
   for (const product of products ?? []) {
     const { quantidade_atual, quantidade_minima } = product
 
-    let tipoAlerta: string | null = null
-    if (quantidade_atual === 0) {
-      tipoAlerta = 'zerado'
-    } else if (quantidade_minima > 0 && quantidade_atual <= quantidade_minima) {
-      tipoAlerta = 'estoque_baixo'
-    }
+    const tipoAlerta = determinarTipoAlerta(quantidade_atual, quantidade_minima)
 
     if (tipoAlerta) {
       const { data: existing } = await supabase

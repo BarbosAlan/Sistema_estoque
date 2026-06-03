@@ -92,3 +92,10 @@
 | Consulta de produtos              | ✅     | Lista com busca em tempo real e indicador de estoque |
 | Registrar saída                   | ✅     | Busca produto, valida estoque, chama registrar_movimento RPC |
 | Alertas push                      | ✅     | Expo push tokens salvos no Supabase; cron dispara notificação para admin/estoquista ao criar novo alerta |
+| Build de produção (EAS)           | ✅     | eas.json criado com perfis dev/preview/production; rodar `eas init` para vincular projectId |
+
+## Qualidade
+
+| Item                              | Status | Notas |
+|-----------------------------------|--------|-------|
+| Testes automatizados              | ✅     | Vitest — 19 testes em @estoque/shared (validators), 5 em web (alertas); `pnpm test` ou `turbo test` |
