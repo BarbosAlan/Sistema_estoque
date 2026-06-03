@@ -24,11 +24,12 @@ const navItems = [
   { href: '/usuarios',       label: 'Usuários',        icon: Users,           perfis: ['admin'] },
 ] as const
 
-interface SidebarProps {
+interface SidebarContentProps {
   perfil: Perfil
+  onNavigate?: () => void
 }
 
-export function Sidebar({ perfil }: SidebarProps) {
+export function SidebarContent({ perfil, onNavigate }: SidebarContentProps) {
   const pathname = usePathname()
 
   const visibleItems = navItems.filter(item =>
@@ -36,8 +37,7 @@ export function Sidebar({ perfil }: SidebarProps) {
   )
 
   return (
-    <aside className="w-60 shrink-0 flex flex-col h-screen bg-card border-r">
-      {/* Logo */}
+    <>
       <div className="flex items-center gap-3 px-5 py-4">
         <Image src="/logo.png" alt="Logo" width={36} height={36} className="shrink-0" />
         <span className="font-semibold text-sm leading-tight">
@@ -48,7 +48,6 @@ export function Sidebar({ perfil }: SidebarProps) {
 
       <Separator />
 
-      {/* Navegação */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {visibleItems.map(({ href, label, icon: Icon }) => {
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -56,6 +55,7 @@ export function Sidebar({ perfil }: SidebarProps) {
             <Link
               key={href}
               href={href}
+              onClick={onNavigate}
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 isActive
@@ -69,6 +69,14 @@ export function Sidebar({ perfil }: SidebarProps) {
           )
         })}
       </nav>
+    </>
+  )
+}
+
+export function Sidebar({ perfil }: { perfil: Perfil }) {
+  return (
+    <aside className="hidden lg:flex w-60 shrink-0 flex-col h-screen bg-card border-r">
+      <SidebarContent perfil={perfil} />
     </aside>
   )
 }

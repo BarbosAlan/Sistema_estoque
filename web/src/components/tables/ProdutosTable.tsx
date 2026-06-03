@@ -47,19 +47,20 @@ export function ProdutosTable() {
   return (
     <div className="space-y-4">
       {/* Cabeçalho */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Produtos</h1>
         {isEstoquista && (
-          <Button onClick={handleNew}>
+          <Button onClick={handleNew} size="sm">
             <Plus className="mr-2 h-4 w-4" />
-            Novo produto
+            <span className="hidden sm:inline">Novo produto</span>
+            <span className="sm:hidden">Novo</span>
           </Button>
         )}
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome..."
@@ -69,7 +70,7 @@ export function ProdutosTable() {
           />
         </div>
         <Select value={categoriaId || 'todas'} onValueChange={(v) => setCategoriaId(!v || v === 'todas' ? '' : v)}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Categoria" />
           </SelectTrigger>
           <SelectContent>
@@ -80,7 +81,7 @@ export function ProdutosTable() {
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={v => setStatus(v as typeof status)}>
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-full sm:w-36">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -92,16 +93,16 @@ export function ProdutosTable() {
       </div>
 
       {/* Tabela */}
-      <div className="rounded-lg border bg-card">
+      <div className="rounded-lg border bg-card overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Código</TableHead>
+              <TableHead className="hidden md:table-cell">Código</TableHead>
               <TableHead>Nome</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Un.</TableHead>
+              <TableHead className="hidden sm:table-cell">Categoria</TableHead>
+              <TableHead className="hidden md:table-cell">Un.</TableHead>
               <TableHead className="text-right">Qtd. atual</TableHead>
-              <TableHead className="text-right">Qtd. mínima</TableHead>
+              <TableHead className="text-right hidden md:table-cell">Qtd. mínima</TableHead>
               <TableHead>Status</TableHead>
               {isEstoquista && <TableHead className="w-24" />}
             </TableRow>
@@ -122,14 +123,14 @@ export function ProdutosTable() {
             ) : (
               products.map(product => (
                 <TableRow key={product.id}>
-                  <TableCell className="font-mono text-sm">{product.codigo}</TableCell>
+                  <TableCell className="hidden md:table-cell font-mono text-sm">{product.codigo}</TableCell>
                   <TableCell className="font-medium">{product.nome}</TableCell>
-                  <TableCell>{product.category?.nome ?? '—'}</TableCell>
-                  <TableCell>{product.unidade_medida}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{product.category?.nome ?? '—'}</TableCell>
+                  <TableCell className="hidden md:table-cell">{product.unidade_medida}</TableCell>
                   <TableCell className={`text-right font-semibold ${product.quantidade_atual <= product.quantidade_minima ? 'text-destructive' : ''}`}>
                     {product.quantidade_atual}
                   </TableCell>
-                  <TableCell className="text-right text-muted-foreground">{product.quantidade_minima}</TableCell>
+                  <TableCell className="text-right text-muted-foreground hidden md:table-cell">{product.quantidade_minima}</TableCell>
                   <TableCell>
                     <Badge variant={product.status === 'ativo' ? 'default' : 'secondary'}>
                       {product.status === 'ativo' ? 'Ativo' : 'Inativo'}

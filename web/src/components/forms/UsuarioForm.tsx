@@ -82,7 +82,7 @@ export function UsuarioFormModal({ open, onClose, user }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[95vw] max-w-md">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Editar usuário' : 'Novo usuário'}</DialogTitle>
         </DialogHeader>

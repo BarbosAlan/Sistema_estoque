@@ -78,7 +78,7 @@ export function MovimentacaoFormModal({ open, onClose, defaultTipo, defaultProdu
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="w-[95vw] max-w-lg">
         <DialogHeader>
           <DialogTitle>Registrar movimentação</DialogTitle>
         </DialogHeader>
@@ -140,7 +140,7 @@ export function MovimentacaoFormModal({ open, onClose, defaultTipo, defaultProdu
               </FormItem>
             )} />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField control={form.control} name="quantidade" render={({ field }) => (
                 <FormItem>
                   <FormLabel>

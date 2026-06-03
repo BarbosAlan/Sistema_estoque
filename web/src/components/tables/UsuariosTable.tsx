@@ -66,15 +66,16 @@ export function UsuariosTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Usuários</h1>
-        <Button onClick={handleNew}>
+        <Button onClick={handleNew} size="sm">
           <Plus className="mr-2 h-4 w-4" />
-          Novo usuário
+          <span className="hidden sm:inline">Novo usuário</span>
+          <span className="sm:hidden">Novo</span>
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Buscar por nome, usuário ou e-mail..."
@@ -84,16 +85,16 @@ export function UsuariosTable() {
         />
       </div>
 
-      <div className="rounded-lg border bg-card">
+      <div className="rounded-lg border bg-card overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead>Usuário</TableHead>
-              <TableHead>E-mail</TableHead>
+              <TableHead className="hidden sm:table-cell">Usuário</TableHead>
+              <TableHead className="hidden md:table-cell">E-mail</TableHead>
               <TableHead>Perfil</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Cadastrado em</TableHead>
+              <TableHead className="hidden md:table-cell">Cadastrado em</TableHead>
               <TableHead className="w-24" />
             </TableRow>
           </TableHeader>
@@ -114,10 +115,10 @@ export function UsuariosTable() {
               filtered.map(user => (
                 <TableRow key={user.id} className={!user.ativo ? 'opacity-50' : ''}>
                   <TableCell className="font-medium">{user.nome}</TableCell>
-                  <TableCell className="font-mono text-sm text-muted-foreground">
+                  <TableCell className="font-mono text-sm text-muted-foreground hidden sm:table-cell">
                     @{user.username}
                   </TableCell>
-                  <TableCell className="text-sm">{user.email}</TableCell>
+                  <TableCell className="text-sm hidden md:table-cell">{user.email}</TableCell>
                   <TableCell>
                     <Badge variant={PERFIL_VARIANTS[user.perfil]}>
                       {PERFIL_LABELS[user.perfil]}
@@ -128,7 +129,7 @@ export function UsuariosTable() {
                       {user.ativo ? 'Ativo' : 'Inativo'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
                     {formatDate(user.criado_em)}
                   </TableCell>
                   <TableCell>

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { PERFIS } from '@estoque/shared'
 import type { Perfil } from '@estoque/shared'
+import { MobileSidebar } from './MobileSidebar'
 
 interface HeaderProps {
   nome: string
@@ -29,7 +30,8 @@ export function Header({ nome, username, perfil }: HeaderProps) {
     .toUpperCase()
 
   return (
-    <header className="h-14 border-b bg-card flex items-center justify-end px-6">
+    <header className="h-14 border-b bg-card flex items-center justify-between px-4">
+      <MobileSidebar perfil={perfil} />
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-accent transition-colors outline-none">
           <Avatar className="h-8 w-8">

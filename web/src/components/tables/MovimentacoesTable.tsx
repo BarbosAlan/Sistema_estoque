@@ -64,22 +64,22 @@ export function MovimentacoesTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Movimentações</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => openModal('saida')}>
-            <ArrowUpCircle className="mr-2 h-4 w-4 text-destructive" />
-            Saída
+          <Button variant="outline" size="sm" onClick={() => openModal('saida')}>
+            <ArrowUpCircle className="h-4 w-4 text-destructive sm:mr-2" />
+            <span className="hidden sm:inline">Saída</span>
           </Button>
-          <Button onClick={() => openModal('entrada')}>
-            <ArrowDownCircle className="mr-2 h-4 w-4" />
-            Entrada
+          <Button size="sm" onClick={() => openModal('entrada')}>
+            <ArrowDownCircle className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Entrada</span>
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar produto..."
@@ -89,7 +89,7 @@ export function MovimentacoesTable() {
           />
         </div>
         <Select value={tipo || 'todos'} onValueChange={v => setTipo(!v || v === 'todos' ? '' : v)}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent>
@@ -100,23 +100,25 @@ export function MovimentacoesTable() {
             <SelectItem value="ajuste_saida">Ajuste -</SelectItem>
           </SelectContent>
         </Select>
-        <Input
-          type="date"
-          value={fromDate}
-          onChange={e => setFromDate(e.target.value)}
-          className="w-40"
-          title="Data inicial"
-        />
-        <Input
-          type="date"
-          value={toDate}
-          onChange={e => setToDate(e.target.value)}
-          className="w-40"
-          title="Data final"
-        />
+        <div className="flex gap-3">
+          <Input
+            type="date"
+            value={fromDate}
+            onChange={e => setFromDate(e.target.value)}
+            className="flex-1 sm:w-40"
+            title="Data inicial"
+          />
+          <Input
+            type="date"
+            value={toDate}
+            onChange={e => setToDate(e.target.value)}
+            className="flex-1 sm:w-40"
+            title="Data final"
+          />
+        </div>
       </div>
 
-      <div className="rounded-lg border bg-card">
+      <div className="rounded-lg border bg-card overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -124,8 +126,8 @@ export function MovimentacoesTable() {
               <TableHead>Produto</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead className="text-right">Qtd.</TableHead>
-              <TableHead>Usuário</TableHead>
-              <TableHead>Motivo</TableHead>
+              <TableHead className="hidden sm:table-cell">Usuário</TableHead>
+              <TableHead className="hidden md:table-cell">Motivo</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -169,8 +171,8 @@ export function MovimentacoesTable() {
                       <span className="text-xs text-muted-foreground ml-1">{m.product.unidade_medida}</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm">{m.profile?.nome ?? m.profile?.username ?? '—'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{m.motivo ?? '—'}</TableCell>
+                  <TableCell className="text-sm hidden sm:table-cell">{m.profile?.nome ?? m.profile?.username ?? '—'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground hidden md:table-cell">{m.motivo ?? '—'}</TableCell>
                 </TableRow>
               ))
             )}
