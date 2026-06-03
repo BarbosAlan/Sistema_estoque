@@ -1,6 +1,7 @@
 'use client'
 
-import { LogOut, ChevronDown } from 'lucide-react'
+import { LogOut, ChevronDown, UserCircle } from 'lucide-react'
+import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -50,6 +51,12 @@ export function Header({ nome, username, perfil }: HeaderProps) {
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuGroup>
             <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link href="/perfil" className="cursor-pointer">
+                <UserCircle className="mr-2 h-4 w-4" />
+                Meu perfil
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="p-0">

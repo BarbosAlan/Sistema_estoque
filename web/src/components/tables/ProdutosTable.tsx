@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Pencil, PackageX, Search, Plus } from 'lucide-react'
 import { useProducts, useInactivateProduct } from '@/hooks/useProducts'
 import { useCategories } from '@/hooks/useCategories'
@@ -15,6 +15,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { ProdutoFormModal } from '@/components/forms/ProdutoForm'
+import { Pagination } from '@/components/ui/pagination'
 import type { ProductWithCategory } from '@/services/productsService'
 
 export function ProdutosTable() {
@@ -24,8 +25,11 @@ export function ProdutosTable() {
   const [status, setStatus] = useState<'ativo' | 'inativo' | 'todos'>('ativo')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null)
+  const [page, setPage] = useState(1)
 
-  const { data: products = [], isLoading } = useProducts({ search, categoria_id: categoriaId, status })
+  const { data: products = [], total, isLoading } = useProducts({ search, categoria_id: categoriaId, status }, page)
+
+  useEffect(() => { setPage(1) }, [search, categoriaId, status])
   const { data: categories = [] } = useCategories()
   const inactivate = useInactivateProduct()
 
@@ -161,6 +165,8 @@ export function ProdutosTable() {
           </TableBody>
         </Table>
       </div>
+
+      <Pagination page={page} total={total} limit={20} onChange={setPage} />
 
       <ProdutoFormModal
         open={modalOpen}

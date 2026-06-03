@@ -10,16 +10,17 @@ export type ProductFilters = {
 }
 
 export const productsService = {
-  async list(filters: ProductFilters = {}): Promise<ProductWithCategory[]> {
+  async list(filters: ProductFilters = {}, page = 1): Promise<{ data: ProductWithCategory[]; total: number }> {
     const params = new URLSearchParams()
     if (filters.search) params.set('search', filters.search)
     if (filters.categoria_id) params.set('categoria_id', filters.categoria_id)
     if (filters.status) params.set('status', filters.status)
+    params.set('page', String(page))
 
     const res = await fetch(`/api/products?${params}`)
     const json = await res.json()
     if (!res.ok) throw new Error(json.error ?? 'Erro ao buscar produtos')
-    return json.data
+    return { data: json.data, total: json.total ?? 0 }
   },
 
   async create(input: CreateProductInput): Promise<ProductWithCategory> {

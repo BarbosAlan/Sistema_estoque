@@ -40,6 +40,15 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="alertas"
+        options={{
+          title: 'Alertas',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="alert-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   )
 }

@@ -11,19 +11,24 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
 
   const supabase = await createClient()
 
+  const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
+  const limit = 20
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
   let query = supabase
     .from('products')
-    .select('*, category:categories(id, nome)')
+    .select('*, category:categories(id, nome)', { count: 'exact' })
     .order('nome')
 
   if (status !== 'todos') query = query.eq('status', status)
   if (categoria_id) query = query.eq('categoria_id', categoria_id)
   if (search) query = query.ilike('nome', `%${search}%`)
 
-  const { data, error } = await query
+  const { data, count, error } = await query.range(from, to)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data })
+  return NextResponse.json({ data, total: count ?? 0 })
 })
 
 export const POST = withAuth(['admin', 'estoquista'], async (req) => {

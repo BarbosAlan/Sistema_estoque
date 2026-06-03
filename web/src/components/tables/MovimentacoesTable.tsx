@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowDownCircle, ArrowUpCircle, Search } from 'lucide-react'
 import { useMovements } from '@/hooks/useMovements'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { MovimentacaoFormModal } from '@/components/forms/MovimentacaoForm'
+import { Pagination } from '@/components/ui/pagination'
 import type { MovementType } from '@estoque/shared'
 
 const TIPO_LABELS: Record<MovementType, string> = {
@@ -40,22 +41,17 @@ export function MovimentacoesTable() {
   const [tipo, setTipo] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
-  const [productSearch, setProductSearch] = useState('')
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
   const [defaultTipo, setDefaultTipo] = useState<'entrada' | 'saida'>('entrada')
 
-  const { data: movements = [], isLoading } = useMovements({
-    tipo,
-    from_date: fromDate,
-    to_date: toDate,
-  })
+  const { data: movements = [], total, isLoading } = useMovements(
+    { tipo, from_date: fromDate, to_date: toDate, search },
+    page,
+  )
 
-  const filtered = productSearch
-    ? movements.filter(m =>
-        m.product?.nome.toLowerCase().includes(productSearch.toLowerCase()) ||
-        m.product?.codigo.toLowerCase().includes(productSearch.toLowerCase())
-      )
-    : movements
+  useEffect(() => { setPage(1) }, [tipo, fromDate, toDate, search])
 
   function openModal(t: 'entrada' | 'saida') {
     setDefaultTipo(t)
@@ -83,8 +79,8 @@ export function MovimentacoesTable() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar produto..."
-            value={productSearch}
-            onChange={e => setProductSearch(e.target.value)}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -137,14 +133,14 @@ export function MovimentacoesTable() {
                   Carregando...
                 </TableCell>
               </TableRow>
-            ) : filtered.length === 0 ? (
+            ) : movements.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
                   Nenhuma movimentação encontrada.
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map(m => (
+              movements.map(m => (
                 <TableRow key={m.id}>
                   <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                     {formatDateTime(m.criado_em)}
@@ -179,6 +175,8 @@ export function MovimentacoesTable() {
           </TableBody>
         </Table>
       </div>
+
+      <Pagination page={page} total={total} limit={20} onChange={setPage} />
 
       <MovimentacaoFormModal
         open={modalOpen}

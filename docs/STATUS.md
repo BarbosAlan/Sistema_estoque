@@ -98,4 +98,13 @@
 
 | Item                              | Status | Notas |
 |-----------------------------------|--------|-------|
-| Testes automatizados              | ✅     | Vitest — 19 testes em @estoque/shared (validators), 5 em web (alertas); `pnpm test` ou `turbo test` |
+| Testes automatizados              | ✅     | Vitest — 19 testes shared (validators), 12 web (alertas + Sidebar); `pnpm test` ou `turbo test` |
+
+## Evoluções
+
+| Item                              | Status | Notas |
+|-----------------------------------|--------|-------|
+| Tela de alertas no mobile         | ✅     | Aba "Alertas" — produtos zerados e com estoque baixo, pull-to-refresh |
+| Edição de perfil (web)            | ✅     | Página /perfil — altera nome e senha; link no menu do header |
+| Paginação nas tabelas             | ✅     | Produtos e Movimentações — 20 por página, server-side; busca de produto em movimentações migrada para servidor |
+| Testes de componentes React       | ✅     | @testing-library/react + jsdom; 7 testes no SidebarContent (permissões por perfil) |
