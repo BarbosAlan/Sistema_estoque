@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server'
 import { withAuth } from '@/lib/auth-middleware'
 import { createServiceClient } from '@/lib/supabase-server'
 
-function buildChartData(movs: Array<{ tipo: string; quantidade: number; criado_em: string }>) {
+function buildChartData(
+  movs: Array<{ tipo: string; quantidade: number; criado_em: string }>,
+  dias: number,
+) {
   const dateMap = new Map<string, { display: string; entradas: number; saidas: number; transferencias: number }>()
 
-  for (let i = 29; i >= 0; i--) {
+  for (let i = dias - 1; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
     const isoKey = d.toISOString().slice(0, 10)
@@ -31,15 +34,20 @@ function buildChartData(movs: Array<{ tipo: string; quantidade: number; criado_e
   }))
 }
 
-export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async () => {
+export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async (req) => {
+  const { searchParams } = new URL(req.url)
+  const dias = [7, 30, 90].includes(Number(searchParams.get('dias')))
+    ? Number(searchParams.get('dias'))
+    : 30
+
   const supabase = await createServiceClient()
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-  thirtyDaysAgo.setHours(0, 0, 0, 0)
+  const periodStart = new Date()
+  periodStart.setDate(periodStart.getDate() - dias)
+  periodStart.setHours(0, 0, 0, 0)
 
   const [
     { data: products },
@@ -75,7 +83,7 @@ export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async () => 
     supabase
       .from('movements')
       .select('tipo, quantidade, criado_em')
-      .gte('criado_em', thirtyDaysAgo.toISOString()),
+      .gte('criado_em', periodStart.toISOString()),
   ])
 
   const list = products ?? []
@@ -121,9 +129,10 @@ export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async () => 
       movsHoje: movsHoje ?? 0,
       movesMes: movesMes ?? 0,
       categorias: categoriasStats,
-      chartData: buildChartData(movsChart ?? []),
+      chartData: buildChartData(movsChart ?? [], dias),
       ultimasMovs: ultimasMovs ?? [],
       produtosCriticos,
+      dias,
     },
   })
 })

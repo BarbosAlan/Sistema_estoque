@@ -112,9 +112,10 @@ export default function RelatoriosPage() {
   const [fornecedorId, setFornecedorId] = useState('')
   const [status, setStatus] = useState<'ativo' | 'inativo' | 'todos'>('ativo')
   const [situacao, setSituacao] = useState<Situacao>('todos')
+  const [semMovDias, setSemMovDias] = useState(0)
 
   const { data: products = [], isLoading } = useProducts(
-    { search, categoria_id: categoriaId, fornecedor_id: fornecedorId, status },
+    { search, categoria_id: categoriaId, fornecedor_id: fornecedorId, status, sem_movimento_dias: semMovDias || undefined },
     1,
     true,
   )
@@ -226,6 +227,17 @@ export default function RelatoriosPage() {
             <SelectItem value="ativo">Ativos</SelectItem>
             <SelectItem value="inativo">Inativos</SelectItem>
             <SelectItem value="todos">Todos</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={semMovDias ? String(semMovDias) : 'todos'} onValueChange={v => setSemMovDias(v === 'todos' ? 0 : Number(v))}>
+          <SelectTrigger className="w-full sm:w-52">
+            <SelectValue placeholder="Produtos parados" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os produtos</SelectItem>
+            <SelectItem value="30">Parados há 30+ dias</SelectItem>
+            <SelectItem value="60">Parados há 60+ dias</SelectItem>
+            <SelectItem value="90">Parados há 90+ dias</SelectItem>
           </SelectContent>
         </Select>
       </div>

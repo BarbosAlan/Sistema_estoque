@@ -10,6 +10,7 @@ export type ProductFilters = {
   status?: 'ativo' | 'inativo' | 'todos'
   order_by?: 'nome' | 'codigo' | 'quantidade_atual' | 'quantidade_minima' | 'valor_unitario' | 'criado_em'
   order_dir?: 'asc' | 'desc'
+  sem_movimento_dias?: number
 }
 
 export const productsService = {
@@ -21,6 +22,7 @@ export const productsService = {
     if (filters.status) params.set('status', filters.status)
     if (filters.order_by) params.set('order_by', filters.order_by)
     if (filters.order_dir) params.set('order_dir', filters.order_dir)
+    if (filters.sem_movimento_dias) params.set('sem_movimento_dias', String(filters.sem_movimento_dias))
     params.set('page', String(page))
     params.set('limit', String(limit))
 

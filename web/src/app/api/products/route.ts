@@ -1,5 +1,5 @@
 import { withAuth } from '@/lib/auth-middleware'
-import { createClient } from '@/lib/supabase-server'
+import { createClient, createServiceClient } from '@/lib/supabase-server'
 import { createProductSchema } from '@estoque/shared'
 import { NextResponse } from 'next/server'
 
@@ -12,6 +12,7 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   const ALLOWED_ORDER = ['nome', 'codigo', 'quantidade_atual', 'quantidade_minima', 'valor_unitario', 'criado_em']
   const order_by = ALLOWED_ORDER.includes(searchParams.get('order_by') ?? '') ? searchParams.get('order_by')! : 'nome'
   const order_dir = searchParams.get('order_dir') === 'desc' ? false : true
+  const sem_movimento_dias = parseInt(searchParams.get('sem_movimento_dias') ?? '') || 0
 
   const supabase = await createClient()
 
@@ -30,13 +31,26 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   if (fornecedor_id) query = query.eq('fornecedor_id', fornecedor_id)
   if (search) query = query.or(`nome.ilike.%${search}%,codigo.ilike.%${search}%`)
 
+  if (sem_movimento_dias > 0) {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - sem_movimento_dias)
+    const { data: ativas } = await supabase
+      .from('movements')
+      .select('produto_id')
+      .gte('criado_em', cutoff.toISOString())
+    const ativasIds = [...new Set((ativas ?? []).map(m => m.produto_id))]
+    if (ativasIds.length > 0) {
+      query = query.not('id', 'in', `(${ativasIds.join(',')})`)
+    }
+  }
+
   const { data, count, error } = await query.range(from, to)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ data, total: count ?? 0 })
 })
 
-export const POST = withAuth(['admin', 'estoquista'], async (req) => {
+export const POST = withAuth(['admin', 'estoquista'], async (req, user) => {
   const body = createProductSchema.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: body.error.flatten().fieldErrors }, { status: 422 })
@@ -53,5 +67,16 @@ export const POST = withAuth(['admin', 'estoquista'], async (req) => {
     const msg = error.message.includes('unique') ? 'Código já cadastrado.' : error.message
     return NextResponse.json({ error: msg }, { status: 400 })
   }
+
+  if (data) {
+    const svc = await createServiceClient()
+    await svc.from('audit_logs').insert({
+      usuario_id: user.id,
+      acao: 'produto.criado',
+      entidade_id: data.id,
+      entidade_nome: data.nome,
+    })
+  }
+
   return NextResponse.json({ data }, { status: 201 })
 })

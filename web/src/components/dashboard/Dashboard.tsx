@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import {
   Package,
   AlertTriangle,
@@ -93,7 +94,8 @@ function LoadingSkeleton() {
 }
 
 export function Dashboard() {
-  const { data, isLoading } = useDashboard()
+  const [dias, setDias] = useState<7 | 30 | 90>(30)
+  const { data, isLoading } = useDashboard(dias)
   useRealtimeDashboard()
 
   if (isLoading) return <LoadingSkeleton />
@@ -215,8 +217,25 @@ export function Dashboard() {
         {/* Gráfico Movimentações */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base font-semibold">Movimentações (Últimos 30 dias)</CardTitle>
-            <span className="text-xs border rounded-md px-2 py-1 text-muted-foreground cursor-default">30 dias ▼</span>
+            <CardTitle className="text-base font-semibold">
+              Movimentações (últimos {dias} dias)
+            </CardTitle>
+            <div className="flex gap-1">
+              {([7, 30, 90] as const).map(d => (
+                <button
+                  key={d}
+                  onClick={() => setDias(d)}
+                  className={cn(
+                    'text-xs px-2 py-1 rounded-md border transition-colors',
+                    dias === d
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'text-muted-foreground hover:bg-accent',
+                  )}
+                >
+                  {d}d
+                </button>
+              ))}
+            </div>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={210}>

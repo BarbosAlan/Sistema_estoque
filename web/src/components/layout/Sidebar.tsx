@@ -13,6 +13,7 @@ import {
   Truck,
   BarChart2,
   Bell,
+  ShieldAlert,
   Settings,
   ChevronDown,
 } from 'lucide-react'
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/fornecedores',   label: 'Fornecedores',    icon: Truck,           perfis: ['admin', 'estoquista'] },
   { href: '/relatorios',     label: 'Relatórios',      icon: BarChart2,       perfis: ['admin', 'estoquista'] },
   { href: '/alertas',        label: 'Alertas',         icon: Bell,            perfis: ['admin', 'estoquista'] },
+  { href: '/auditoria',      label: 'Auditoria',       icon: ShieldAlert,     perfis: ['admin'] },
   { href: '/configuracoes',  label: 'Configurações',   icon: Settings,        perfis: ['admin'] },
 ] as const
 

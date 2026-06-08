@@ -37,8 +37,8 @@ export interface DashboardData {
   }>
 }
 
-export async function getDashboard(): Promise<DashboardData> {
-  const res = await fetch('/api/dashboard')
+export async function getDashboard(dias = 30): Promise<DashboardData> {
+  const res = await fetch(`/api/dashboard?dias=${dias}`)
   const json = await res.json()
   if (!res.ok) throw new Error(json.error ?? 'Erro ao carregar dashboard')
   return json.data
