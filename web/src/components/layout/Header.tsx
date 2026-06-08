@@ -1,6 +1,6 @@
 'use client'
 
-import { LogOut, UserCircle, Bell } from 'lucide-react'
+import { LogOut, UserCircle, Bell, Sun, Moon } from 'lucide-react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -16,6 +16,8 @@ import { PERFIS } from '@estoque/shared'
 import type { Perfil } from '@estoque/shared'
 import { MobileSidebar } from './MobileSidebar'
 import { GlobalSearch } from './GlobalSearch'
+import { useTheme } from './ThemeProvider'
+import { useAlertCount } from '@/hooks/useAlertCount'
 
 interface HeaderProps {
   nome: string
@@ -24,6 +26,9 @@ interface HeaderProps {
 }
 
 export function Header({ nome, perfil, email }: HeaderProps) {
+  const { theme, toggle } = useTheme()
+  const { data: alertCount = 0 } = useAlertCount()
+
   const initials = nome
     .split(' ')
     .slice(0, 2)
@@ -46,13 +51,33 @@ export function Header({ nome, perfil, email }: HeaderProps) {
         </div>
       </div>
 
-      {/* Right: search + bell + avatar */}
+      {/* Right: search + theme + bell + avatar */}
       <div className="flex items-center gap-2 shrink-0">
         <GlobalSearch />
 
-        {/* Bell */}
-        <Link href="/alertas" className="relative h-9 w-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors">
+        {/* Theme toggle */}
+        <button
+          onClick={toggle}
+          className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+          title={theme === 'dark' ? 'Mudar para claro' : 'Mudar para escuro'}
+        >
+          {theme === 'dark'
+            ? <Sun className="h-5 w-5 text-muted-foreground" />
+            : <Moon className="h-5 w-5 text-muted-foreground" />
+          }
+        </button>
+
+        {/* Bell with badge */}
+        <Link
+          href="/alertas"
+          className="relative h-9 w-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+        >
           <Bell className="h-5 w-5 text-muted-foreground" />
+          {alertCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center leading-none">
+              {alertCount > 99 ? '99+' : alertCount}
+            </span>
+          )}
         </Link>
 
         {/* Avatar dropdown */}

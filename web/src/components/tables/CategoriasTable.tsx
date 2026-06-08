@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { CategoriaFormModal } from '@/components/forms/CategoriaForm'
 import type { Category } from '@/services/categoriesService'
 
@@ -19,6 +20,7 @@ export function CategoriasTable() {
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Category | null>(null)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   const { data: categorias = [], isLoading } = useCategories()
   const inactivate = useInactivateCategory()
@@ -29,8 +31,16 @@ export function CategoriasTable() {
     (c.descricao ?? '').toLowerCase().includes(search.toLowerCase()),
   )
 
+  const confirmTarget = categorias.find(c => c.id === confirmId)
+
   function openCreate() { setEditing(null); setModalOpen(true) }
   function openEdit(c: Category) { setEditing(c); setModalOpen(true) }
+
+  async function handleConfirmDelete() {
+    if (!confirmId) return
+    await inactivate.mutateAsync(confirmId)
+    setConfirmId(null)
+  }
 
   return (
     <div className="space-y-4">
@@ -106,8 +116,7 @@ export function CategoriasTable() {
                           variant="ghost"
                           size="icon"
                           className="h-7 w-7 text-destructive hover:text-destructive"
-                          onClick={() => inactivate.mutate(cat.id)}
-                          disabled={inactivate.isPending}
+                          onClick={() => setConfirmId(cat.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -122,6 +131,16 @@ export function CategoriasTable() {
       </div>
 
       <CategoriaFormModal open={modalOpen} onClose={() => setModalOpen(false)} categoria={editing} />
+
+      <ConfirmDialog
+        open={!!confirmId}
+        title="Remover categoria"
+        description={`Deseja remover a categoria "${confirmTarget?.nome}"? Produtos vinculados não serão afetados.`}
+        confirmLabel="Remover"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmId(null)}
+        loading={inactivate.isPending}
+      />
     </div>
   )
 }

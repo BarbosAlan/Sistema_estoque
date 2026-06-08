@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowDownCircle, ArrowUpCircle, Search, PackageMinus } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, Search, PackageMinus, FileText, FileSpreadsheet } from 'lucide-react'
 import { useMovements } from '@/hooks/useMovements'
+import { listMovements } from '@/services/movementsService'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +17,7 @@ import { MovimentacaoFormModal } from '@/components/forms/MovimentacaoForm'
 import { SaidaEmLoteModal } from '@/components/forms/SaidaEmLoteForm'
 import { Pagination } from '@/components/ui/pagination'
 import type { MovementType } from '@estoque/shared'
+import type { MovementWithRelations } from '@/services/movementsService'
 
 const TIPO_LABELS: Record<MovementType, string> = {
   entrada: 'Entrada',
@@ -45,6 +47,59 @@ const TITULOS: Record<string, string> = {
   '': 'Movimentações',
 }
 
+function exportPDF(movements: MovementWithRelations[], titulo: string) {
+  import('jspdf').then(async ({ jsPDF }) => {
+    const { default: autoTable } = await import('jspdf-autotable')
+    const doc = new jsPDF({ orientation: 'landscape' })
+    const now = new Date().toLocaleString('pt-BR')
+    doc.setFontSize(16)
+    doc.text(titulo, 14, 16)
+    doc.setFontSize(9)
+    doc.setTextColor(120)
+    doc.text(`Gerado em: ${now}`, 14, 23)
+    autoTable(doc, {
+      startY: 28,
+      head: [['Data', 'Produto', 'Código', 'Tipo', 'Quantidade', 'Usuário', 'Motivo']],
+      body: movements.map(m => [
+        formatDateTime(m.criado_em),
+        m.product?.nome ?? '—',
+        m.product?.codigo ?? '—',
+        TIPO_LABELS[m.tipo],
+        `${['saida', 'ajuste_saida'].includes(m.tipo) ? '-' : '+'}${m.quantidade} ${m.product?.unidade_medida ?? ''}`.trim(),
+        m.profile?.nome ?? m.profile?.username ?? '—',
+        m.motivo ?? '—',
+      ]),
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [220, 0, 0] },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
+    })
+    doc.save(`movimentacoes-${new Date().toISOString().slice(0, 10)}.pdf`)
+  })
+}
+
+function exportExcel(movements: MovementWithRelations[], titulo: string) {
+  import('xlsx').then(({ utils, writeFile }) => {
+    const rows = movements.map(m => ({
+      'Data': formatDateTime(m.criado_em),
+      'Produto': m.product?.nome ?? '—',
+      'Código': m.product?.codigo ?? '—',
+      'Tipo': TIPO_LABELS[m.tipo],
+      'Quantidade': (['saida', 'ajuste_saida'].includes(m.tipo) ? -1 : 1) * m.quantidade,
+      'Unidade': m.product?.unidade_medida ?? '',
+      'Usuário': m.profile?.nome ?? m.profile?.username ?? '—',
+      'Motivo': m.motivo ?? '',
+    }))
+    const ws = utils.json_to_sheet(rows)
+    ws['!cols'] = [
+      { wch: 18 }, { wch: 32 }, { wch: 12 }, { wch: 14 },
+      { wch: 10 }, { wch: 8 }, { wch: 22 }, { wch: 30 },
+    ]
+    const wb = utils.book_new()
+    utils.book_append_sheet(wb, ws, titulo.slice(0, 31))
+    writeFile(wb, `movimentacoes-${new Date().toISOString().slice(0, 10)}.xlsx`)
+  })
+}
+
 interface MovimentacoesTableProps {
   tipoFixo?: 'entrada' | 'saida' | 'ajuste'
 }
@@ -58,6 +113,7 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
   const [modalOpen, setModalOpen] = useState(false)
   const [defaultTipo, setDefaultTipo] = useState<'entrada' | 'saida'>('entrada')
   const [loteOpen, setLoteOpen] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   const { data: movements = [], total, isLoading } = useMovements(
     { tipo, from_date: fromDate, to_date: toDate, search },
@@ -72,12 +128,41 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
   }
 
   const titulo = TITULOS[tipoFixo ?? ''] ?? 'Movimentações'
+  const filters = { tipo, from_date: fromDate, to_date: toDate, search }
+
+  async function handleExport(format: 'pdf' | 'excel') {
+    setExporting(true)
+    try {
+      const { data } = await listMovements(filters, 1)
+      // fetch all pages if needed
+      let all = data
+      if (total > 20) {
+        const pages = Math.ceil(total / 20)
+        const rest = await Promise.all(
+          Array.from({ length: pages - 1 }, (_, i) => listMovements(filters, i + 2))
+        )
+        all = [data, ...rest.map(r => r.data)].flat()
+      }
+      if (format === 'pdf') exportPDF(all, titulo)
+      else exportExcel(all, titulo)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">{titulo}</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap justify-end">
+          <Button variant="outline" size="sm" onClick={() => handleExport('excel')} disabled={exporting || movements.length === 0}>
+            <FileSpreadsheet className="h-4 w-4 text-green-600 sm:mr-2" />
+            <span className="hidden sm:inline">Excel</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} disabled={exporting || movements.length === 0}>
+            <FileText className="h-4 w-4 text-destructive sm:mr-2" />
+            <span className="hidden sm:inline">PDF</span>
+          </Button>
           {(!tipoFixo || tipoFixo === 'saida') && (
             <Button variant="outline" size="sm" onClick={() => setLoteOpen(true)}>
               <PackageMinus className="h-4 w-4 text-destructive sm:mr-2" />
@@ -116,18 +201,18 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
           />
         </div>
         {!tipoFixo && (
-        <Select value={tipo || 'todos'} onValueChange={v => setTipo(!v || v === 'todos' ? '' : v)}>
-          <SelectTrigger className="w-full sm:w-44">
-            <SelectValue placeholder="Tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos os tipos</SelectItem>
-            <SelectItem value="entrada">Entrada</SelectItem>
-            <SelectItem value="saida">Saída</SelectItem>
-            <SelectItem value="ajuste_entrada">Ajuste +</SelectItem>
-            <SelectItem value="ajuste_saida">Ajuste -</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select value={tipo || 'todos'} onValueChange={v => setTipo(!v || v === 'todos' ? '' : v)}>
+            <SelectTrigger className="w-full sm:w-44">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os tipos</SelectItem>
+              <SelectItem value="entrada">Entrada</SelectItem>
+              <SelectItem value="saida">Saída</SelectItem>
+              <SelectItem value="ajuste_entrada">Ajuste +</SelectItem>
+              <SelectItem value="ajuste_saida">Ajuste -</SelectItem>
+            </SelectContent>
+          </Select>
         )}
         <div className="flex gap-3">
           <Input

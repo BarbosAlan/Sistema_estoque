@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Pagination } from '@/components/ui/pagination'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { FornecedorFormModal } from '@/components/forms/FornecedorForm'
 import type { Fornecedor } from '@/services/fornecedoresService'
 
@@ -16,13 +17,22 @@ export function FornecedoresTable() {
   const [page, setPage] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Fornecedor | null>(null)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   const { data: fornecedores, total, isLoading } = useFornecedores(search, page)
   const inactivate = useInactivateFornecedor()
   const { isAdmin, isEstoquista } = useAuth()
 
+  const confirmTarget = fornecedores.find(f => f.id === confirmId)
+
   function openCreate() { setEditing(null); setModalOpen(true) }
   function openEdit(f: Fornecedor) { setEditing(f); setModalOpen(true) }
+
+  async function handleConfirmDelete() {
+    if (!confirmId) return
+    await inactivate.mutateAsync(confirmId)
+    setConfirmId(null)
+  }
 
   return (
     <div className="space-y-4">
@@ -112,8 +122,7 @@ export function FornecedoresTable() {
                           variant="ghost"
                           size="icon"
                           className="h-7 w-7 text-destructive hover:text-destructive"
-                          onClick={() => inactivate.mutate(f.id)}
-                          disabled={inactivate.isPending}
+                          onClick={() => setConfirmId(f.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -130,6 +139,16 @@ export function FornecedoresTable() {
       <Pagination page={page} total={total} limit={20} onChange={setPage} />
 
       <FornecedorFormModal open={modalOpen} onClose={() => setModalOpen(false)} fornecedor={editing} />
+
+      <ConfirmDialog
+        open={!!confirmId}
+        title="Remover fornecedor"
+        description={`Deseja remover "${confirmTarget?.nome}"? Produtos vinculados a ele não serão afetados.`}
+        confirmLabel="Remover"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmId(null)}
+        loading={inactivate.isPending}
+      />
     </div>
   )
 }

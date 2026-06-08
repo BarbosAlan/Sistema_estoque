@@ -6,6 +6,7 @@ export type ProductWithCategory = Product & { category: { id: string; nome: stri
 export type ProductFilters = {
   search?: string
   categoria_id?: string
+  fornecedor_id?: string
   status?: 'ativo' | 'inativo' | 'todos'
 }
 
@@ -14,6 +15,7 @@ export const productsService = {
     const params = new URLSearchParams()
     if (filters.search) params.set('search', filters.search)
     if (filters.categoria_id) params.set('categoria_id', filters.categoria_id)
+    if (filters.fornecedor_id) params.set('fornecedor_id', filters.fornecedor_id)
     if (filters.status) params.set('status', filters.status)
     params.set('page', String(page))
     params.set('limit', String(limit))

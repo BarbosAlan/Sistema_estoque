@@ -7,6 +7,7 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search') ?? ''
   const categoria_id = searchParams.get('categoria_id') ?? ''
+  const fornecedor_id = searchParams.get('fornecedor_id') ?? ''
   const status = searchParams.get('status') ?? 'ativo'
 
   const supabase = await createClient()
@@ -23,6 +24,7 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
 
   if (status !== 'todos') query = query.eq('status', status)
   if (categoria_id) query = query.eq('categoria_id', categoria_id)
+  if (fornecedor_id) query = query.eq('fornecedor_id', fornecedor_id)
   if (search) query = query.ilike('nome', `%${search}%`)
 
   const { data, count, error } = await query.range(from, to)

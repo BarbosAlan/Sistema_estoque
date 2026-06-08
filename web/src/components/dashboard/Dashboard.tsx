@@ -29,6 +29,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { useDashboard } from '@/hooks/useDashboard'
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -93,6 +94,7 @@ function LoadingSkeleton() {
 
 export function Dashboard() {
   const { data, isLoading } = useDashboard()
+  useRealtimeDashboard()
 
   if (isLoading) return <LoadingSkeleton />
   if (!data) return null
@@ -287,7 +289,7 @@ export function Dashboard() {
                           <SituacaoBadge atual={p.quantidade_atual} minimo={p.quantidade_minima} />
                         </td>
                         <td className="px-3 py-3 text-center">
-                          <Link href={`/produtos`} className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted transition-colors">
+                          <Link href={`/produtos/${p.id}`} className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted transition-colors">
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           </Link>
                         </td>

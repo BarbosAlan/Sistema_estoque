@@ -3,6 +3,18 @@ import { createClient } from '@/lib/supabase-server'
 import { updateProductSchema } from '@estoque/shared'
 import { NextResponse } from 'next/server'
 
+export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (_, __, { params }) => {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, category:categories(id, nome), fornecedor:fornecedores(id, nome)')
+    .eq('id', id)
+    .single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 404 })
+  return NextResponse.json({ data })
+})
+
 export const PATCH = withAuth(['admin', 'estoquista'], async (req, _, { params }) => {
   const { id } = await params
   const body = updateProductSchema.safeParse(await req.json())
