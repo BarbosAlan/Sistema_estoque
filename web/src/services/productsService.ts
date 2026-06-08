@@ -8,6 +8,8 @@ export type ProductFilters = {
   categoria_id?: string
   fornecedor_id?: string
   status?: 'ativo' | 'inativo' | 'todos'
+  order_by?: 'nome' | 'codigo' | 'quantidade_atual' | 'quantidade_minima' | 'valor_unitario' | 'criado_em'
+  order_dir?: 'asc' | 'desc'
 }
 
 export const productsService = {
@@ -17,6 +19,8 @@ export const productsService = {
     if (filters.categoria_id) params.set('categoria_id', filters.categoria_id)
     if (filters.fornecedor_id) params.set('fornecedor_id', filters.fornecedor_id)
     if (filters.status) params.set('status', filters.status)
+    if (filters.order_by) params.set('order_by', filters.order_by)
+    if (filters.order_dir) params.set('order_dir', filters.order_dir)
     params.set('page', String(page))
     params.set('limit', String(limit))
 

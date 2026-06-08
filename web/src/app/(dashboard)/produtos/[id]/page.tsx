@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useMovements } from '@/hooks/useMovements'
@@ -7,6 +8,7 @@ import { ArrowLeft, Package, Tag, Truck, MapPin, DollarSign, AlertTriangle, Tren
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Pagination } from '@/components/ui/pagination'
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
@@ -65,6 +67,7 @@ function buildChartData(movements: { tipo: MovementType; quantidade: number; cri
 export default function ProdutoDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const [movsPage, setMovsPage] = useState(1)
 
   const { data: product, isLoading: loadingProduct } = useQuery({
     queryKey: ['product', id],
@@ -72,9 +75,9 @@ export default function ProdutoDetailPage() {
     enabled: !!id,
   })
 
-  const { data: movements = [], isLoading: loadingMovs } = useMovements(
+  const { data: movements = [], total: movsTotal, isLoading: loadingMovs } = useMovements(
     { produto_id: id },
-    1,
+    movsPage,
   )
 
   if (loadingProduct) {
@@ -272,6 +275,11 @@ export default function ProdutoDetailPage() {
               </TableBody>
             </Table>
           </div>
+          {movsTotal > 20 && (
+            <div className="p-4 border-t">
+              <Pagination page={movsPage} total={movsTotal} limit={20} onChange={setMovsPage} />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

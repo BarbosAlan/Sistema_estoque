@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Pencil, PackageX, PackageCheck, Search, Plus, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { SortHeader } from '@/components/ui/sort-header'
 import { useProducts, useInactivateProduct, useUpdateProduct } from '@/hooks/useProducts'
 import { useCategories } from '@/hooks/useCategories'
 import { useFornecedores } from '@/hooks/useFornecedores'
@@ -29,17 +30,25 @@ export function ProdutosTable() {
   const [categoriaId, setCategoriaId] = useState('')
   const [fornecedorId, setFornecedorId] = useState('')
   const [status, setStatus] = useState<'ativo' | 'inativo' | 'todos'>('ativo')
+  const [orderBy, setOrderBy] = useState<'nome' | 'codigo' | 'quantidade_atual' | 'quantidade_minima' | 'valor_unitario'>('nome')
+  const [orderDir, setOrderDir] = useState<'asc' | 'desc'>('asc')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
 
   const { data: products = [], total, isLoading } = useProducts(
-    { search, categoria_id: categoriaId, fornecedor_id: fornecedorId, status },
+    { search, categoria_id: categoriaId, fornecedor_id: fornecedorId, status, order_by: orderBy, order_dir: orderDir },
     page,
   )
 
-  useEffect(() => { setPage(1) }, [search, categoriaId, fornecedorId, status])
+  useEffect(() => { setPage(1) }, [search, categoriaId, fornecedorId, status, orderBy, orderDir])
+
+  function handleSort(col: string) {
+    if (orderBy === col) setOrderDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setOrderBy(col as typeof orderBy); setOrderDir('asc') }
+    setPage(1)
+  }
   const { data: categories = [] } = useCategories()
   const { data: fornecedores = [] } = useFornecedores()
   const inactivate = useInactivateProduct()
@@ -79,7 +88,7 @@ export function ProdutosTable() {
         <div className="relative flex-1 min-w-[160px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nome..."
+            placeholder="Buscar por nome ou código..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-9"
@@ -123,14 +132,14 @@ export function ProdutosTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="hidden md:table-cell">Código</TableHead>
-              <TableHead>Nome</TableHead>
+              <SortHeader label="Código" col="codigo" current={orderBy} dir={orderDir} onSort={handleSort} className="hidden md:table-cell" />
+              <SortHeader label="Nome" col="nome" current={orderBy} dir={orderDir} onSort={handleSort} />
               <TableHead className="hidden sm:table-cell">Categoria</TableHead>
               <TableHead className="hidden lg:table-cell">Fornecedor</TableHead>
               <TableHead className="hidden xl:table-cell">Localização</TableHead>
               <TableHead className="hidden md:table-cell">Un.</TableHead>
-              <TableHead className="text-right">Qtd. atual</TableHead>
-              <TableHead className="text-right hidden md:table-cell">Qtd. mínima</TableHead>
+              <SortHeader label="Qtd. atual" col="quantidade_atual" current={orderBy} dir={orderDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="Qtd. mínima" col="quantidade_minima" current={orderBy} dir={orderDir} onSort={handleSort} className="text-right hidden md:table-cell" />
               <TableHead>Status</TableHead>
               <TableHead className="w-28" />
             </TableRow>

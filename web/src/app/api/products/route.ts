@@ -9,6 +9,9 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   const categoria_id = searchParams.get('categoria_id') ?? ''
   const fornecedor_id = searchParams.get('fornecedor_id') ?? ''
   const status = searchParams.get('status') ?? 'ativo'
+  const ALLOWED_ORDER = ['nome', 'codigo', 'quantidade_atual', 'quantidade_minima', 'valor_unitario', 'criado_em']
+  const order_by = ALLOWED_ORDER.includes(searchParams.get('order_by') ?? '') ? searchParams.get('order_by')! : 'nome'
+  const order_dir = searchParams.get('order_dir') === 'desc' ? false : true
 
   const supabase = await createClient()
 
@@ -20,12 +23,12 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   let query = supabase
     .from('products')
     .select('*, category:categories(id, nome), fornecedor:fornecedores(id, nome)', { count: 'exact' })
-    .order('nome')
+    .order(order_by, { ascending: order_dir })
 
   if (status !== 'todos') query = query.eq('status', status)
   if (categoria_id) query = query.eq('categoria_id', categoria_id)
   if (fornecedor_id) query = query.eq('fornecedor_id', fornecedor_id)
-  if (search) query = query.ilike('nome', `%${search}%`)
+  if (search) query = query.or(`nome.ilike.%${search}%,codigo.ilike.%${search}%`)
 
   const { data, count, error } = await query.range(from, to)
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Tag, Plus, Pencil, Trash2, Search } from 'lucide-react'
+import { SortHeader } from '@/components/ui/sort-header'
 import { useCategories, useInactivateCategory } from '@/hooks/useCategories'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,8 @@ function formatDate(iso: string) {
 
 export function CategoriasTable() {
   const [search, setSearch] = useState('')
+  const [orderBy, setOrderBy] = useState<'nome' | 'criado_em'>('nome')
+  const [orderDir, setOrderDir] = useState<'asc' | 'desc'>('asc')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Category | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
@@ -26,10 +29,21 @@ export function CategoriasTable() {
   const inactivate = useInactivateCategory()
   const { isAdmin } = useAuth()
 
-  const filtered = categorias.filter(c =>
-    c.nome.toLowerCase().includes(search.toLowerCase()) ||
-    (c.descricao ?? '').toLowerCase().includes(search.toLowerCase()),
-  )
+  const filtered = categorias
+    .filter(c =>
+      c.nome.toLowerCase().includes(search.toLowerCase()) ||
+      (c.descricao ?? '').toLowerCase().includes(search.toLowerCase()),
+    )
+    .sort((a, b) => {
+      const va = a[orderBy] ?? ''
+      const vb = b[orderBy] ?? ''
+      return orderDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+    })
+
+  function handleSort(col: string) {
+    if (orderBy === col) setOrderDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setOrderBy(col as typeof orderBy); setOrderDir('asc') }
+  }
 
   const confirmTarget = categorias.find(c => c.id === confirmId)
 
@@ -66,9 +80,9 @@ export function CategoriasTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Categoria</TableHead>
+              <SortHeader label="Categoria" col="nome" current={orderBy} dir={orderDir} onSort={handleSort} />
               <TableHead className="hidden sm:table-cell">Descrição</TableHead>
-              <TableHead className="hidden md:table-cell">Criada em</TableHead>
+              <SortHeader label="Criada em" col="criado_em" current={orderBy} dir={orderDir} onSort={handleSort} className="hidden md:table-cell" />
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
