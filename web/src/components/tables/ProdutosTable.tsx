@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Pencil, PackageX, PackageCheck, Search, Plus, Eye } from 'lucide-react'
+import { Pencil, PackageX, PackageCheck, Search, Plus, Eye, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { SortHeader } from '@/components/ui/sort-header'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { ProdutoFormModal } from '@/components/forms/ProdutoForm'
+import { ImportacaoModal } from '@/components/modals/ImportacaoModal'
 import { Pagination } from '@/components/ui/pagination'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
@@ -34,6 +35,7 @@ export function ProdutosTable() {
   const [orderBy, setOrderBy] = useState<'nome' | 'codigo' | 'quantidade_atual' | 'quantidade_minima' | 'valor_unitario'>('nome')
   const [orderDir, setOrderDir] = useState<'asc' | 'desc'>('asc')
   const [modalOpen, setModalOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
@@ -77,11 +79,17 @@ export function ProdutosTable() {
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Produtos</h1>
         {isEstoquista && (
-          <Button onClick={() => { setEditingProduct(null); setModalOpen(true) }} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Novo produto</span>
-            <span className="sm:hidden">Novo</span>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+              <Upload className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Importar</span>
+            </Button>
+            <Button onClick={() => { setEditingProduct(null); setModalOpen(true) }} size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Novo produto</span>
+              <span className="sm:hidden">Novo</span>
+            </Button>
+          </div>
         )}
       </div>
 
@@ -227,6 +235,8 @@ export function ProdutosTable() {
         onClose={() => setModalOpen(false)}
         product={editingProduct}
       />
+
+      <ImportacaoModal open={importOpen} onClose={() => setImportOpen(false)} />
 
       <ConfirmDialog
         open={!!confirmId}

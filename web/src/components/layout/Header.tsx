@@ -1,6 +1,6 @@
 'use client'
 
-import { LogOut, UserCircle, Bell, Sun, Moon } from 'lucide-react'
+import { LogOut, UserCircle, Sun, Moon } from 'lucide-react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -16,6 +16,7 @@ import { PERFIS } from '@estoque/shared'
 import type { Perfil } from '@estoque/shared'
 import { MobileSidebar } from './MobileSidebar'
 import { GlobalSearch } from './GlobalSearch'
+import { AlertsPanel } from './AlertsPanel'
 import { useTheme } from './ThemeProvider'
 import { useAlertCount } from '@/hooks/useAlertCount'
 
@@ -67,18 +68,8 @@ export function Header({ nome, perfil, email }: HeaderProps) {
           }
         </button>
 
-        {/* Bell with badge */}
-        <Link
-          href="/alertas"
-          className="relative h-9 w-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
-        >
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          {alertCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center leading-none">
-              {alertCount > 99 ? '99+' : alertCount}
-            </span>
-          )}
-        </Link>
+        {/* Bell with alerts panel */}
+        <AlertsPanel alertCount={alertCount} />
 
         {/* Avatar dropdown */}
         <DropdownMenu>
