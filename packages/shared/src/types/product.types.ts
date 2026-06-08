@@ -13,6 +13,7 @@ export interface Product {
   codigo: string
   nome: string
   categoria_id: string
+  fornecedor_id: string | null
   descricao: string | null
   unidade_medida: string
   quantidade_atual: number
@@ -22,4 +23,5 @@ export interface Product {
   status: ProductStatus
   criado_em: string
   category?: Category
+  fornecedor?: { id: string; nome: string } | null
 }

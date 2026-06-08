@@ -15,7 +15,7 @@ export const PATCH = withAuth(['admin', 'estoquista'], async (req, _, { params }
     .from('products')
     .update(body.data)
     .eq('id', id)
-    .select('*, category:categories(id, nome)')
+    .select('*, category:categories(id, nome), fornecedor:fornecedores(id, nome)')
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })

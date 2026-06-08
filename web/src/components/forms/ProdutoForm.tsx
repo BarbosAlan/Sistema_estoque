@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { createProductSchema, type CreateProductInput } from '@estoque/shared'
 import { useCreateProduct, useUpdateProduct } from '@/hooks/useProducts'
 import { useCategories } from '@/hooks/useCategories'
+import { useFornecedores } from '@/hooks/useFornecedores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -28,6 +29,7 @@ interface Props {
 
 export function ProdutoFormModal({ open, onClose, product }: Props) {
   const { data: categories = [] } = useCategories()
+  const { data: fornecedores = [] } = useFornecedores()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
   const isEditing = !!product
@@ -35,8 +37,9 @@ export function ProdutoFormModal({ open, onClose, product }: Props) {
   const form = useForm<CreateProductInput>({
     resolver: zodResolver(createProductSchema),
     defaultValues: {
-      codigo: '', nome: '', categoria_id: '', unidade_medida: 'un',
-      quantidade_minima: 0, valor_unitario: 0, descricao: '', localizacao: '',
+      codigo: '', nome: '', categoria_id: '', fornecedor_id: null,
+      unidade_medida: 'un', quantidade_minima: 0, valor_unitario: 0,
+      descricao: '', localizacao: '',
     },
   })
 
@@ -49,11 +52,12 @@ export function ProdutoFormModal({ open, onClose, product }: Props) {
         unidade_medida: product.unidade_medida,
         quantidade_minima: product.quantidade_minima,
         valor_unitario: product.valor_unitario ?? 0,
+        fornecedor_id: product.fornecedor_id ?? null,
         descricao: product.descricao ?? '',
         localizacao: product.localizacao ?? '',
       })
     } else {
-      form.reset({ codigo: '', nome: '', categoria_id: '', unidade_medida: 'un', quantidade_minima: 0, valor_unitario: 0 })
+      form.reset({ codigo: '', nome: '', categoria_id: '', fornecedor_id: null, unidade_medida: 'un', quantidade_minima: 0, valor_unitario: 0 })
     }
   }, [product, form])
 
@@ -113,6 +117,24 @@ export function ProdutoFormModal({ open, onClose, product }: Props) {
                   <SelectContent>
                     {categories.map(c => (
                       <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="fornecedor_id" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fornecedor <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
+                <Select value={field.value ?? ''} onValueChange={v => field.onChange(v || null)}>
+                  <FormControl>
+                    <SelectTrigger><SelectValue placeholder="Selecione um fornecedor..." /></SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">Nenhum</SelectItem>
+                    {fornecedores.map(f => (
+                      <SelectItem key={f.id} value={f.id}>{f.nome}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

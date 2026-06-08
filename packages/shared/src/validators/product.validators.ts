@@ -4,6 +4,7 @@ export const createProductSchema = z.object({
   codigo: z.string().min(1, 'Código obrigatório'),
   nome: z.string().min(1, 'Nome obrigatório'),
   categoria_id: z.string().uuid('Categoria inválida'),
+  fornecedor_id: z.string().uuid().nullable().optional(),
   descricao: z.string().optional(),
   unidade_medida: z.string().min(1, 'Unidade obrigatória'),
   quantidade_minima: z.number().int().min(0),

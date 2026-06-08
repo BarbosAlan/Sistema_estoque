@@ -18,7 +18,7 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
 
   let query = supabase
     .from('products')
-    .select('*, category:categories(id, nome)', { count: 'exact' })
+    .select('*, category:categories(id, nome), fornecedor:fornecedores(id, nome)', { count: 'exact' })
     .order('nome')
 
   if (status !== 'todos') query = query.eq('status', status)
@@ -41,7 +41,7 @@ export const POST = withAuth(['admin', 'estoquista'], async (req) => {
   const { data, error } = await supabase
     .from('products')
     .insert(body.data)
-    .select('*, category:categories(id, nome)')
+    .select('*, category:categories(id, nome), fornecedor:fornecedores(id, nome)')
     .single()
 
   if (error) {

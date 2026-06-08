@@ -1,6 +1,6 @@
 'use client'
 
-import { LogOut, UserCircle, Search, Bell } from 'lucide-react'
+import { LogOut, UserCircle, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -15,6 +15,7 @@ import {
 import { PERFIS } from '@estoque/shared'
 import type { Perfil } from '@estoque/shared'
 import { MobileSidebar } from './MobileSidebar'
+import { GlobalSearch } from './GlobalSearch'
 
 interface HeaderProps {
   nome: string
@@ -47,15 +48,7 @@ export function Header({ nome, perfil, email }: HeaderProps) {
 
       {/* Right: search + bell + avatar */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Search bar */}
-        <div className="hidden md:flex items-center gap-2 bg-muted/60 border rounded-lg px-3 py-1.5 w-56">
-          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-          <input
-            type="text"
-            placeholder="Buscar produtos, categorias..."
-            className="bg-transparent text-sm outline-none placeholder:text-muted-foreground w-full"
-          />
-        </div>
+        <GlobalSearch />
 
         {/* Bell */}
         <Link href="/alertas" className="relative h-9 w-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors">
