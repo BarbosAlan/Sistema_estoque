@@ -6,9 +6,11 @@ import { createMovementSchema } from '@estoque/shared'
 export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async (req) => {
   const { searchParams } = new URL(req.url)
   const produto_id = searchParams.get('produto_id') || ''
+  const usuario_id = searchParams.get('usuario_id') || ''
   const tipo = searchParams.get('tipo') || ''
   const from_date = searchParams.get('from_date') || ''
   const to_date = searchParams.get('to_date') || ''
+  const order_dir = searchParams.get('order_dir') === 'asc' ? true : false
 
   const search = searchParams.get('search') || ''
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
@@ -37,10 +39,11 @@ export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async (req) 
       product:products(id, nome, codigo, unidade_medida),
       profile:profiles!movements_usuario_id_fkey(id, nome, username)
     `, { count: 'exact' })
-    .order('criado_em', { ascending: false })
+    .order('criado_em', { ascending: order_dir })
 
   if (produtoIds) query = query.in('produto_id', produtoIds)
   if (produto_id) query = query.eq('produto_id', produto_id)
+  if (usuario_id) query = query.eq('usuario_id', usuario_id)
   if (tipo === 'ajuste') query = query.in('tipo', ['ajuste_entrada', 'ajuste_saida'])
   else if (tipo) query = query.eq('tipo', tipo)
   if (from_date) query = query.gte('criado_em', from_date)

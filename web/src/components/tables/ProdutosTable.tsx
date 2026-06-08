@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Pencil, PackageX, PackageCheck, Search, Plus, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { SortHeader } from '@/components/ui/sort-header'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 import { useProducts, useInactivateProduct, useUpdateProduct } from '@/hooks/useProducts'
 import { useCategories } from '@/hooks/useCategories'
 import { useFornecedores } from '@/hooks/useFornecedores'
@@ -146,11 +147,7 @@ export function ProdutosTable() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={10} className="text-center py-10 text-muted-foreground">
-                  Carregando...
-                </TableCell>
-              </TableRow>
+              <TableSkeleton rows={8} cols={10} />
             ) : products.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={10} className="text-center py-10 text-muted-foreground">

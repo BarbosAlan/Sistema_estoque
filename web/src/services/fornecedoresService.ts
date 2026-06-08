@@ -18,10 +18,12 @@ export interface FornecedorInput {
 }
 
 export const fornecedoresService = {
-  async list(search = '', page = 1): Promise<{ data: Fornecedor[]; total: number }> {
+  async list(search = '', page = 1, order_by = 'nome', order_dir: 'asc' | 'desc' = 'asc'): Promise<{ data: Fornecedor[]; total: number }> {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
     params.set('page', String(page))
+    params.set('order_by', order_by)
+    params.set('order_dir', order_dir)
 
     const res = await fetch(`/api/fornecedores?${params}`)
     const json = await res.json()

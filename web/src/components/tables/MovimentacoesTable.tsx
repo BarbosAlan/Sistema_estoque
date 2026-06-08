@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ArrowDownCircle, ArrowUpCircle, Search, PackageMinus, FileText, FileSpreadsheet } from 'lucide-react'
 import { useMovements } from '@/hooks/useMovements'
+import { useProfiles } from '@/hooks/useProfiles'
 import { listMovements } from '@/services/movementsService'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +14,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { SortHeader } from '@/components/ui/sort-header'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 import { MovimentacaoFormModal } from '@/components/forms/MovimentacaoForm'
 import { SaidaEmLoteModal } from '@/components/forms/SaidaEmLoteForm'
 import { Pagination } from '@/components/ui/pagination'
@@ -109,18 +112,21 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [search, setSearch] = useState('')
+  const [usuarioId, setUsuarioId] = useState('')
+  const [orderDir, setOrderDir] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
   const [defaultTipo, setDefaultTipo] = useState<'entrada' | 'saida'>('entrada')
   const [loteOpen, setLoteOpen] = useState(false)
   const [exporting, setExporting] = useState(false)
 
+  const { data: profiles = [] } = useProfiles()
   const { data: movements = [], total, isLoading } = useMovements(
-    { tipo, from_date: fromDate, to_date: toDate, search },
+    { tipo, from_date: fromDate, to_date: toDate, search, usuario_id: usuarioId, order_dir: orderDir },
     page,
   )
 
-  useEffect(() => { setPage(1) }, [tipo, fromDate, toDate, search])
+  useEffect(() => { setPage(1) }, [tipo, fromDate, toDate, search, usuarioId, orderDir])
 
   function openModal(t: 'entrada' | 'saida') {
     setDefaultTipo(t)
@@ -128,7 +134,7 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
   }
 
   const titulo = TITULOS[tipoFixo ?? ''] ?? 'Movimentações'
-  const filters = { tipo, from_date: fromDate, to_date: toDate, search }
+  const filters = { tipo, from_date: fromDate, to_date: toDate, search, usuario_id: usuarioId, order_dir: orderDir }
 
   async function handleExport(format: 'pdf' | 'excel') {
     setExporting(true)
@@ -214,6 +220,17 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
             </SelectContent>
           </Select>
         )}
+        <Select value={usuarioId || 'todos'} onValueChange={v => { setUsuarioId(!v || v === 'todos' ? '' : v); setPage(1) }}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Todos os usuários" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os usuários</SelectItem>
+            {profiles.map(p => (
+              <SelectItem key={p.id} value={p.id}>{p.nome || p.username}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex gap-3">
           <Input
             type="date"
@@ -236,7 +253,13 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Data</TableHead>
+              <SortHeader
+                label="Data"
+                col="criado_em"
+                current="criado_em"
+                dir={orderDir}
+                onSort={() => setOrderDir(d => d === 'asc' ? 'desc' : 'asc')}
+              />
               <TableHead>Produto</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead className="text-right">Qtd.</TableHead>
@@ -246,11 +269,7 @@ export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                  Carregando...
-                </TableCell>
-              </TableRow>
+              <TableSkeleton rows={8} cols={6} />
             ) : movements.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">

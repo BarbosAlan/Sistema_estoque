@@ -4,10 +4,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { fornecedoresService, type FornecedorInput } from '@/services/fornecedoresService'
 
-export function useFornecedores(search = '', page = 1) {
+export function useFornecedores(
+  search = '',
+  page = 1,
+  order_by = 'nome',
+  order_dir: 'asc' | 'desc' = 'asc',
+) {
   const query = useQuery({
-    queryKey: ['fornecedores', search, page],
-    queryFn: () => fornecedoresService.list(search, page),
+    queryKey: ['fornecedores', search, page, order_by, order_dir],
+    queryFn: () => fornecedoresService.list(search, page, order_by, order_dir),
   })
   return { ...query, data: query.data?.data ?? [], total: query.data?.total ?? 0 }
 }

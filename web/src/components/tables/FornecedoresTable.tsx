@@ -9,17 +9,27 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Pagination } from '@/components/ui/pagination'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { SortHeader } from '@/components/ui/sort-header'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 import { FornecedorFormModal } from '@/components/forms/FornecedorForm'
 import type { Fornecedor } from '@/services/fornecedoresService'
 
 export function FornecedoresTable() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [orderBy, setOrderBy] = useState('nome')
+  const [orderDir, setOrderDir] = useState<'asc' | 'desc'>('asc')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Fornecedor | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
 
-  const { data: fornecedores, total, isLoading } = useFornecedores(search, page)
+  function handleSort(col: string) {
+    if (orderBy === col) setOrderDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setOrderBy(col); setOrderDir('asc') }
+    setPage(1)
+  }
+
+  const { data: fornecedores, total, isLoading } = useFornecedores(search, page, orderBy, orderDir)
   const inactivate = useInactivateFornecedor()
   const { isAdmin, isEstoquista } = useAuth()
 
@@ -60,21 +70,20 @@ export function FornecedoresTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Fornecedor</TableHead>
+              <SortHeader label="Fornecedor" col="nome" current={orderBy} dir={orderDir} onSort={handleSort} />
               <TableHead className="hidden sm:table-cell">CNPJ</TableHead>
               <TableHead className="hidden md:table-cell">Contato</TableHead>
               <TableHead className="hidden lg:table-cell">Observação</TableHead>
+              <SortHeader label="Cadastrado em" col="criado_em" current={orderBy} dir={orderDir} onSort={handleSort} className="hidden xl:table-cell" />
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">Carregando...</TableCell>
-              </TableRow>
+              <TableSkeleton rows={6} cols={5} />
             ) : fornecedores.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
                   {search ? 'Nenhum fornecedor encontrado.' : 'Nenhum fornecedor cadastrado.'}
                 </TableCell>
               </TableRow>
@@ -109,6 +118,9 @@ export function FornecedoresTable() {
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground hidden lg:table-cell max-w-[200px]">
                     <span className="truncate block">{f.observacao || '—'}</span>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground hidden xl:table-cell whitespace-nowrap">
+                    {new Date(f.criado_em).toLocaleDateString('pt-BR')}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">

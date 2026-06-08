@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Tag, Plus, Pencil, Trash2, Search } from 'lucide-react'
 import { SortHeader } from '@/components/ui/sort-header'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 import { useCategories, useInactivateCategory } from '@/hooks/useCategories'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
@@ -89,9 +90,7 @@ export function CategoriasTable() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">Carregando...</TableCell>
-              </TableRow>
+              <TableSkeleton rows={5} cols={5} />
             ) : filtered.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">

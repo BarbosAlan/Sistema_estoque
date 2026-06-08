@@ -18,6 +18,9 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
   const limit = 20
   const from = (page - 1) * limit
   const to = from + limit - 1
+  const ALLOWED_ORDER = ['nome', 'criado_em']
+  const order_by = ALLOWED_ORDER.includes(searchParams.get('order_by') ?? '') ? searchParams.get('order_by')! : 'nome'
+  const order_dir = searchParams.get('order_dir') === 'desc' ? false : true
 
   const supabase = await createServiceClient()
 
@@ -25,7 +28,7 @@ export const GET = withAuth(['admin', 'estoquista', 'funcionario'], async (req) 
     .from('fornecedores')
     .select('*', { count: 'exact' })
     .eq('ativo', true)
-    .order('nome')
+    .order(order_by, { ascending: order_dir })
 
   if (search) query = query.ilike('nome', `%${search}%`)
 
