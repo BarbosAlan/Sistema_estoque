@@ -36,7 +36,7 @@ export function ProdutoFormModal({ open, onClose, product }: Props) {
     resolver: zodResolver(createProductSchema),
     defaultValues: {
       codigo: '', nome: '', categoria_id: '', unidade_medida: 'un',
-      quantidade_minima: 0, descricao: '', localizacao: '',
+      quantidade_minima: 0, valor_unitario: 0, descricao: '', localizacao: '',
     },
   })
 
@@ -48,11 +48,12 @@ export function ProdutoFormModal({ open, onClose, product }: Props) {
         categoria_id: product.categoria_id,
         unidade_medida: product.unidade_medida,
         quantidade_minima: product.quantidade_minima,
+        valor_unitario: product.valor_unitario ?? 0,
         descricao: product.descricao ?? '',
         localizacao: product.localizacao ?? '',
       })
     } else {
-      form.reset({ codigo: '', nome: '', categoria_id: '', unidade_medida: 'un', quantidade_minima: 0 })
+      form.reset({ codigo: '', nome: '', categoria_id: '', unidade_medida: 'un', quantidade_minima: 0, valor_unitario: 0 })
     }
   }, [product, form])
 
@@ -129,14 +130,31 @@ export function ProdutoFormModal({ open, onClose, product }: Props) {
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="localizacao" render={({ field }) => (
+              <FormField control={form.control} name="valor_unitario" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Localização</FormLabel>
-                  <FormControl><Input placeholder="Prateleira A1..." {...field} /></FormControl>
+                  <FormLabel>Valor unitário (R$)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      placeholder="0,00"
+                      {...field}
+                      onChange={e => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
             </div>
+
+            <FormField control={form.control} name="localizacao" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Localização</FormLabel>
+                <FormControl><Input placeholder="Prateleira A1..." {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
 
             <FormField control={form.control} name="descricao" render={({ field }) => (
               <FormItem>

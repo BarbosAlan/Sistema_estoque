@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { listMovements, createMovement, type MovementFilters } from '@/services/movementsService'
 
 export function useMovements(filters: MovementFilters = {}, page = 1) {
@@ -16,6 +17,8 @@ export function useCreateMovement() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['movements'] })
       qc.invalidateQueries({ queryKey: ['products'] })
+      toast.success('Movimentação registrada!')
     },
+    onError: (err: Error) => toast.error(err.message ?? 'Erro ao registrar movimentação'),
   })
 }

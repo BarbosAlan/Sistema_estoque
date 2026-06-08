@@ -7,6 +7,7 @@ export const createProductSchema = z.object({
   descricao: z.string().optional(),
   unidade_medida: z.string().min(1, 'Unidade obrigatória'),
   quantidade_minima: z.number().int().min(0),
+  valor_unitario: z.number().min(0).optional().default(0),
   localizacao: z.string().optional(),
 })
 

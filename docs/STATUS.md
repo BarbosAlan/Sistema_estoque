@@ -108,3 +108,8 @@
 | Edição de perfil (web)            | ✅     | Página /perfil — altera nome e senha; link no menu do header |
 | Paginação nas tabelas             | ✅     | Produtos e Movimentações — 20 por página, server-side; busca de produto em movimentações migrada para servidor |
 | Testes de componentes React       | ✅     | @testing-library/react + jsdom; 7 testes no SidebarContent (permissões por perfil) |
+| Dashboard redesenhado             | ✅     | KPI cards, gráfico 3 linhas (Recharts), tabela de produtos críticos, ações rápidas 2×2 |
+| Páginas da sidebar                | ✅     | Categorias, Entradas, Saídas, Transferências, Fornecedores, Configurações |
+| Migration valor_unitario          | ✅     | 20260608000000_add_valor_unitario.sql — campo no form de produto e KPI "Valor de Estoque" |
+| Migration fornecedores            | ✅     | 20260608120000_add_fornecedores.sql — tabela com RLS |
+| Toast notifications               | ✅     | Sonner — sucesso/erro em produtos, categorias, fornecedores e movimentações |

@@ -41,7 +41,8 @@ export const GET = withAuth(['funcionario', 'estoquista', 'admin'], async (req) 
 
   if (produtoIds) query = query.in('produto_id', produtoIds)
   if (produto_id) query = query.eq('produto_id', produto_id)
-  if (tipo) query = query.eq('tipo', tipo)
+  if (tipo === 'ajuste') query = query.in('tipo', ['ajuste_entrada', 'ajuste_saida'])
+  else if (tipo) query = query.eq('tipo', tipo)
   if (from_date) query = query.gte('criado_em', from_date)
   if (to_date) query = query.lte('criado_em', to_date + 'T23:59:59Z')
 

@@ -17,6 +17,7 @@ export interface Product {
   unidade_medida: string
   quantidade_atual: number
   quantidade_minima: number
+  valor_unitario: number
   localizacao: string | null
   status: ProductStatus
   criado_em: string

@@ -1,14 +1,26 @@
-import type { MovementType } from '@estoque/shared'
-
 export interface DashboardData {
   totalProdutos: number
+  valorEstoque: number
   produtosAlerta: number
   produtosZerados: number
   movsHoje: number
   movesMes: number
+  categorias: Array<{
+    id: string
+    nome: string
+    total: number
+    valorTotal: number
+    percentualSaudavel: number
+  }>
+  chartData: Array<{
+    date: string
+    entradas: number
+    saidas: number
+    transferencias: number
+  }>
   ultimasMovs: Array<{
     id: string
-    tipo: MovementType
+    tipo: string
     quantidade: number
     criado_em: string
     product: { nome: string; codigo: string; unidade_medida: string } | null
@@ -21,6 +33,7 @@ export interface DashboardData {
     unidade_medida: string
     quantidade_atual: number
     quantidade_minima: number
+    categoria_nome: string
   }>
 }
 

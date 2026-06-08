@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { SidebarContent } from './Sidebar'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
 import type { Perfil } from '@estoque/shared'
 
-export function MobileSidebar({ perfil }: { perfil: Perfil }) {
+interface MobileSidebarProps {
+  perfil: Perfil
+  nome: string
+  email: string
+}
+
+export function MobileSidebar({ perfil, nome, email }: MobileSidebarProps) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -17,15 +24,13 @@ export function MobileSidebar({ perfil }: { perfil: Perfil }) {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="lg:hidden"
+      <button
+        className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'lg:hidden')}
         onClick={() => setOpen(true)}
       >
         <Menu className="h-5 w-5" />
         <span className="sr-only">Abrir menu</span>
-      </Button>
+      </button>
 
       {open && (
         <>
@@ -34,16 +39,14 @@ export function MobileSidebar({ perfil }: { perfil: Perfil }) {
             onClick={() => setOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 z-50 flex flex-col w-60 bg-card border-r shadow-xl lg:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2"
+            <button
+              className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'absolute top-2 right-2')}
               onClick={() => setOpen(false)}
             >
               <X className="h-4 w-4" />
               <span className="sr-only">Fechar</span>
-            </Button>
-            <SidebarContent perfil={perfil} onNavigate={() => setOpen(false)} />
+            </button>
+            <SidebarContent perfil={perfil} nome={nome} email={email} onNavigate={() => setOpen(false)} />
           </div>
         </>
       )}

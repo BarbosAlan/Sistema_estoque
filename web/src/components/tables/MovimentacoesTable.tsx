@@ -38,8 +38,19 @@ function formatDateTime(iso: string) {
   }).format(new Date(iso))
 }
 
-export function MovimentacoesTable() {
-  const [tipo, setTipo] = useState('')
+const TITULOS: Record<string, string> = {
+  entrada: 'Entradas',
+  saida: 'Saídas',
+  ajuste: 'Transferências e Ajustes',
+  '': 'Movimentações',
+}
+
+interface MovimentacoesTableProps {
+  tipoFixo?: 'entrada' | 'saida' | 'ajuste'
+}
+
+export function MovimentacoesTable({ tipoFixo }: MovimentacoesTableProps = {}) {
+  const [tipo, setTipo] = useState(tipoFixo ?? '')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [search, setSearch] = useState('')
@@ -60,23 +71,37 @@ export function MovimentacoesTable() {
     setModalOpen(true)
   }
 
+  const titulo = TITULOS[tipoFixo ?? ''] ?? 'Movimentações'
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">Movimentações</h1>
+        <h1 className="text-2xl font-bold">{titulo}</h1>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setLoteOpen(true)}>
-            <PackageMinus className="h-4 w-4 text-destructive sm:mr-2" />
-            <span className="hidden sm:inline">Saída em lote</span>
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => openModal('saida')}>
-            <ArrowUpCircle className="h-4 w-4 text-destructive sm:mr-2" />
-            <span className="hidden sm:inline">Saída</span>
-          </Button>
-          <Button size="sm" onClick={() => openModal('entrada')}>
-            <ArrowDownCircle className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">Entrada</span>
-          </Button>
+          {(!tipoFixo || tipoFixo === 'saida') && (
+            <Button variant="outline" size="sm" onClick={() => setLoteOpen(true)}>
+              <PackageMinus className="h-4 w-4 text-destructive sm:mr-2" />
+              <span className="hidden sm:inline">Saída em lote</span>
+            </Button>
+          )}
+          {(!tipoFixo || tipoFixo === 'saida') && (
+            <Button variant="outline" size="sm" onClick={() => openModal('saida')}>
+              <ArrowUpCircle className="h-4 w-4 text-destructive sm:mr-2" />
+              <span className="hidden sm:inline">Nova Saída</span>
+            </Button>
+          )}
+          {(!tipoFixo || tipoFixo === 'entrada') && (
+            <Button size="sm" onClick={() => openModal('entrada')}>
+              <ArrowDownCircle className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Nova Entrada</span>
+            </Button>
+          )}
+          {tipoFixo === 'ajuste' && (
+            <Button size="sm" onClick={() => openModal('entrada')}>
+              <ArrowDownCircle className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Novo Ajuste</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -90,6 +115,7 @@ export function MovimentacoesTable() {
             className="pl-9"
           />
         </div>
+        {!tipoFixo && (
         <Select value={tipo || 'todos'} onValueChange={v => setTipo(!v || v === 'todos' ? '' : v)}>
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder="Tipo" />
@@ -102,6 +128,7 @@ export function MovimentacoesTable() {
             <SelectItem value="ajuste_saida">Ajuste -</SelectItem>
           </SelectContent>
         </Select>
+        )}
         <div className="flex gap-3">
           <Input
             type="date"
